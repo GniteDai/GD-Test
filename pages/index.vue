@@ -2,8 +2,9 @@
   <div class="index-outer">
     <Header @changePanel="changePanel"/>
     <div class="panel-outer">
-      <panelContent @panel="panel" v-if="this.panel === ''"/>
-      <AstarSearch @panel="panel" v-if="this.panel === 'A*'"/>
+      <panelContent :panel='panel' v-if="this.panel === ''"/>
+      <AstarSearch :panel='panel' v-if="this.panel === 'A*'"/>
+      <Dmap :panel='panel' v-if="this.panel === 'map'" />
     </div>
     
   </div>
@@ -13,16 +14,18 @@
 import Header from '~/components/header.vue';
 import panelContent from '~/components/panelContent.vue';
 import AstarSearch from '~/components/algorithm/A-star-search.vue';
+import Dmap from '~/components/mapbox/mapbox.vue';
 
 export default {
   components: {
     Header,
     panelContent,
-    AstarSearch
+    AstarSearch,
+    Dmap
   },
   data() {
     return {
-      panel: ''
+      panel: '',
     }
   },
   methods:{

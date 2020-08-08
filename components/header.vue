@@ -17,15 +17,15 @@ export default {
           href: 'A*'
         },
         {
-          title: "Test",
-          href: 'Test'
+          title: "Map",
+          href: 'map'
         }
       ]
     }
   },
   methods: {
     changePanel(res){
-      this.$emit('changePanel', res)
+      this.$emit('changePanel', res);
     }
   }
 }
