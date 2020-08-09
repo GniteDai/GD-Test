@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="test-outer" v-for="test of arrayTest" :key="test" v-html="test" />
+    <div class="test-inner" v-for="test of arrayTest" :key="test" v-html="test" />
   </div>
 </template>
 
@@ -24,10 +24,11 @@ export default {
 </style>
 
 <style scoped>
-  .test-outer {
+  .test-inner {
     width: 100%;
     height: auto;
     color: green;
     font-size: 1.67vw;
+    text-align: center;
   }
 </style>

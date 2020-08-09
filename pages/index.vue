@@ -6,7 +6,6 @@
       <AstarSearch :panel='panel' v-if="this.panel === 'A*'"/>
       <Dmap :panel='panel' v-if="this.panel === 'map'" />
     </div>
-    
   </div>
 </template>
 
@@ -40,6 +39,7 @@ export default {
   html {
     scrollbar-width: none;
     height: 100%;
+    background-color: black;
   }
   body {
     -ms-overflow-style: none;
@@ -54,7 +54,6 @@ export default {
 
 <style scoped>
   .index-outer {
-    background-color: black;
     width: 100%;
     height: auto;
   }
