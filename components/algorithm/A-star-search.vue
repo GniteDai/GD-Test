@@ -2,20 +2,28 @@
   <div @click.middle.prevent="aStarGoSearch" @click.right.prevent="cancelBuild">
     <div class="menu">
       <div class="menu-item" @click="aStarGoSearch">Go Search</div>
-      <div class="menu-item" @click="test(true)">Build white</div>
-      <!-- <div class="menu-item" @click="setBasic(false)">Build random</div> -->
-      <div class="menu-item" @click="test(false)">Build random</div>
-      <!-- <div @click="openRouteChange" :class="{ 'menu-item-Selected' : b_openRouteChange }">牆壁相反改變</div> -->
-      <div class="menu-item" @click="openBuildWall" :class="{ 'menu-item-Selected' : b_openBuildWall }">建立牆壁</div>
-      <div class="menu-item" @click="cancelWall" :class="{ 'menu-item-Selected' : b_openCancelWall }">取消牆壁</div>
+      <div class="menu-item" @click="autoSearch(true)">Build white</div>
+      <div class="menu-item" @click="autoSearch(false)">Build random</div>
+      <div class="menu-item" @click="openBuildWall" :class="{ 'menu-item-Selected' : s_function === 'buildWall' }">建立牆壁</div>
+      <div class="menu-item" @click="delWall" :class="{ 'menu-item-Selected' : s_function === 'delWall' }">刪除牆壁</div>
+      <div class="menu-item" @click="setStart" :class="{ 'menu-item-Selected' : s_function === 'setStart' }">設立 起始點</div>
+      <div class="menu-item" @click="setEnd" :class="{ 'menu-item-Selected' : s_function === 'setEnd' }">設立 終點</div>
     </div>
-    <div class="remind-text"> 右鍵 可快速關閉 已選取功能</div>
+    <div class="remind-text">
+      set Row => <el-input-number v-model="size.row" @change="reSetSize" :min="5" :max="100" label="Row"></el-input-number>
+    </div>
+    <div class="remind-text">
+      set Column => <el-input-number v-model="size.column" @change="reSetSize" :min="5" :max="100" label="Column"></el-input-number>
+    </div>
+    <div class="remind-text"> 左鍵（預設）設立 終點 </div>
+    <div class="remind-text"> 中鍵 快速執行 Search </div>
+    <div class="remind-text"> 右鍵 快速關閉 選取功能 </div>
     <div class="a-star-outer">
       <div class="test-outer" v-for="(row, row_index) in arrayTest" :key="row_index">
-        <!-- <div class="test-inner" ref="column" v-for="(column, column_index) in row" :key="column_index" v-html="column.info" @mouseover="changeRoute(row_index, column)"></div> -->
+        <!-- <div class="test-inner" ref="column" v-for="(column, column_index) in row" :key="column_index" @mouseover="changeRoute(row_index, column)"></div> -->
         <!-- <div class="test-inner" ref="column" v-for="(column, column_index) in row" :key="column_index" @mouseover="changeRoute(row_index, column)" :class="[column.wall === true ? 'isWall' : 'isNotWall']"></div> -->
-        <div class="test-inner" ref="column" v-for="(column, column_index) in row" :key="column_index" @mouseover="changeRoute(row_index, column)" @click.right.prevent="cancelBuild" :class="[column.wall === 0 ? 'isWall' : 'isNotWall', {isStart: column.start, isEnd: column.end, isPass: column.pass}]"></div>
-        <!-- <div class="test-inner" ref="column" :data.prop="column" v-for="(column, column_index) in row" :key="column_index" v-html="column.info" @mouseover="changeRouteTest(column)"></div> -->
+        <div class="test-inner" v-for="(column, column_index) in row" :key="column_index" @click.left="setStartOrEnd(column)" @mouseover="changeRoute(column)" @click.right.prevent="cancelBuild" :class="[column.wall === 0 ? 'isWall' : 'isNotWall', {isStart: column.start, isEnd: column.end, isPass: column.pass}]"></div>
+        <!-- <div class="test-inner" ref="column" :data.prop="column" v-for="(column, column_index) in row" :key="column_index" @mouseover="changeRouteTest(column)"></div> -->
       </div>
     </div>
   </div>
@@ -28,14 +36,25 @@ export default {
   data(){
     return{
       arrayTest: [],
-      b_openRouteChange: false,
-      b_openBuildWall: false,
-      b_openCancelWall: false,
+      now_data: {
+        start: {
+          x: 0,
+          y: 0
+        },
+        end: {
+          x: 0,
+          y: 0
+        }
+      },
+      s_function: '',
+      size: {
+        row: 10,
+        column: 10
+      }
     }
   },
   mounted(){
-    // this.setBasic(false);
-    this.test();
+    this.autoSearch(false);
   },
   methods: {
     getRandomInt(){
@@ -50,9 +69,9 @@ export default {
       // 列
       let column = []
       let data = {}
-      for(let i=0; i<=9; i++){
+      for(let i= 0; i<=this.size.row-1; i++){
         column = []
-        for(let j = 0; j<=9;j++){
+        for(let j = 0; j<=this.size.column-1;j++){
           data = {
             x: i,
             y: j,
@@ -61,73 +80,59 @@ export default {
             start: false,
             end: false
           }
-          data.info = data.wall ? 'x' : 'o';
           column.push(data);
           data = {}
         }
         row.push(column)
       }
       this.arrayTest = row;
+      
+      // Set Start
+      this.now_data.start.x = 0
+      this.now_data.start.y = 0
+      this.arrayTest[0][0].start = true;
+      this.arrayTest[0][0].wall = 1;
+
+      // Set End
+      this.now_data.end.x = this.size.row-1
+      this.now_data.end.y = this.size.column-1
+      this.arrayTest[this.size.row-1][this.size.column-1].end = true;
+      this.arrayTest[this.size.row-1][this.size.column-1].wall = 1;
     },
-    changeRoute(outer, inner){
-      // if(this.b_openRouteChange){
-      //   inner.wall = !inner.wall;
-      //   inner.info = inner.wall ? 'X' : 'o';
-      // }else if(this.b_openBuildWall){
-      //   inner.wall = 0;
-      //   inner.pass = false;
-      //   inner.info = 'X';
-      // }else if(this.b_openCancelWall){
-      //   inner.wall = 1;
-      //   inner.pass = false;
-      //   inner.info = 'o';
-      // }
-      if(this.b_openBuildWall){
+    changeRoute(column){
+      if(this.s_function === 'buildWall'){
         this.clearPassRoute()
-        inner.wall = 0;
-        inner.pass = false;
-        inner.info = 'X';
-      }else if(this.b_openCancelWall){
+        column.wall = 0;
+        column.pass = false;
+      }else if(this.s_function === 'delWall'){
         this.clearPassRoute()
-        inner.wall = 1;
-        inner.pass = false;
-        inner.info = 'o';
+        column.wall = 1;
+        column.pass = false;
       }
     },
     changeRouteTest(inner){
       // Test => Get elements Data property
       console.log('data => ', this.$refs.column[0].data)
     },
-    openRouteChange(){
-      // 相反
-      this.b_openRouteChange = !this.b_openRouteChange;
-      this.b_openBuildWall = false;
-      this.b_openCancelWall = false;
-    },
     buildWall(b_No_Wall){
+      // 0 is Wall
+      // 1 is pass
       let wall = b_No_Wall ? 1 : this.getRandomInt() <= 0 ? 0 : 1
       return wall
     },
     openBuildWall(){
       // 建立
-      this.b_openBuildWall = !this.b_openBuildWall;
-      this.b_openRouteChange = false;
-      this.b_openCancelWall = false;
+      this.s_function = 'buildWall'
     },
-    cancelWall(){
+    delWall(){
       // 取消
-      this.b_openCancelWall = !this.b_openCancelWall;
-      this.b_openRouteChange = false;
-      this.b_openBuildWall = false;
+      this.s_function = 'delWall'
     },
-    test(b_No_Wall){
+    autoSearch(b_No_Wall){
+      // b_No_Wall
+      // true ==> del all wall
+      // false ==> random wall
       this.setBasic(b_No_Wall);
-
-      this.arrayTest[0][0].start = true;
-      this.arrayTest[0][0].wall = 1;
-      this.arrayTest[9][9].end = true;
-      this.arrayTest[9][9].wall = 1;
-
       this.aStarGoSearch();
     },
     aStarGoSearch(){
@@ -138,36 +143,20 @@ export default {
       let allRowIndex = 0;
       let rowData = [];
       let columnData = [];
-      let start_XY = {
-        x: 0,
-        y: 0
-      }
-      let end_XY = {
-        x: 0,
-        y: 0
-      }
 
       for(let row of this.arrayTest){
         columnData = []
         for(let column of row){
           column.pass = false;
           columnData.push(column.wall)
-          if(column.start){
-            start_XY.x = column.x
-            start_XY.y = column.y
-          }
-          if(column.end){
-            end_XY.x = column.x
-            end_XY.y = column.y
-          }
         }
         allRowIndex++;
         rowData.push(columnData)
       }
 
       let graph = new Graph(rowData);
-      let start = graph.grid[start_XY.x][start_XY.y];
-      let end = graph.grid[end_XY.x][end_XY.y];
+      let start = graph.grid[this.now_data.start.x][this.now_data.start.y];
+      let end = graph.grid[this.now_data.end.x][this.now_data.end.y];
       
       let result = astar.search(graph, start, end);
       let index = 0
@@ -187,8 +176,45 @@ export default {
       }
     },
     cancelBuild(){
-      this.b_openBuildWall = false
-      this.b_openCancelWall = false
+      this.s_function = ''
+    },
+    setStart(){
+      this.s_function = 'setStart'
+    },
+    setEnd(){
+      this.s_function = 'setEnd'
+    },
+    setStartOrEnd(column){
+      switch(this.s_function){
+        case 'setStart':
+          // set Start position
+          this.arrayTest[this.now_data.start.x][this.now_data.start.y].start = false;
+          this.now_data.start.x = column.x;
+          this.now_data.start.y = column.y;
+          column.start = true;
+          break;
+        case 'setEnd':
+          // set End position
+          this.arrayTest[this.now_data.end.x][this.now_data.end.y].end = false;
+          this.now_data.end.x = column.x;
+          this.now_data.end.y = column.y;
+          column.end = true;
+          break;
+        default:
+          // set End position
+          this.arrayTest[this.now_data.end.x][this.now_data.end.y].end = false;
+          this.now_data.end.x = column.x;
+          this.now_data.end.y = column.y;
+          column.end = true;
+          break;
+      }
+      this.clearPassRoute()
+      this.aStarGoSearch()
+      this.s_function = ''
+    },
+    reSetSize(){
+      this.setBasic(false)
+      this.aStarGoSearch()
     }
   },
 }
@@ -224,8 +250,8 @@ export default {
     height: auto;
     text-align: center;
     color: red;
-    font-size: 2.67vw;
-    margin: 0 0 3%;
+    font-size: 2vw;
+    margin: 0 0 1%;
   }
   .a-star-outer {
     margin: 0 0 8%;
