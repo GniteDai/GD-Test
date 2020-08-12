@@ -1,10 +1,16 @@
 <template>
   <div class="index-outer">
-    <Header @changePanel="changePanel"/>
-    <div class="panel-outer">
-      <panelContent :panel='panel' v-if="this.panel === ''"/>
-      <AstarSearch :panel='panel' v-if="this.panel === 'A*'"/>
-      <Dmap :panel='panel' v-if="this.panel === 'map'" />
+    <div v-if="this.panel !== 'newSearch'">
+      <Header @changePanel="changePanel"/>
+      <div class="panel-outer">
+        <panelContent :panel='panel' v-if="this.panel === ''"/>
+        <AstarSearch :panel='panel' v-if="this.panel === 'A*'"/>
+        <Dmap :panel='panel' v-if="this.panel === 'map'" />
+      </div>
+    </div>
+    
+    <div v-else>
+      <newSearch />
     </div>
   </div>
 </template>
@@ -15,16 +21,19 @@ import panelContent from '~/components/panelContent.vue';
 import AstarSearch from '~/components/algorithm/A-star-search.vue';
 import Dmap from '~/components/mapbox/mapbox.vue';
 
+import newSearch from '~/components/newSearch.vue';
+
 export default {
   components: {
     Header,
     panelContent,
     AstarSearch,
-    Dmap
+    Dmap,
+    newSearch
   },
   data() {
     return {
-      panel: '',
+      panel: 'newSearch',
       
     }
   },
