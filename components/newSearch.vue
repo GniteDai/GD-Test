@@ -30,6 +30,7 @@
 <script>
 import reSizeBoard from './reSizeBoard.vue';
 import astar from '~/assets/astar.js'
+import launchAnimations from '~/assets/animations/launchAnimations.js'
 
 export default {
   components: {
@@ -42,6 +43,7 @@ export default {
         row: 10,
         column: 20,
         node: [],
+        isObject: false,
         mouse: {
           status: '',
           previouslyNode: '',
@@ -211,10 +213,12 @@ export default {
       let target = this.board.target
       let nodesToAnimate = []
       let astarAlgorithm = astar(nodesToObject, start, target, nodesToAnimate, nodes, 'astar', undefined, this.board.node)
+      // launchAnimations(this.board, astarAlgorithm, "weighted");
       console.log('astarAlgorithm => ', astarAlgorithm)
-      console.log('node => ', this.board.node)
-      console.log('nodesToAnimate => ', nodesToAnimate)
       console.log('nodesToObject => ', nodesToObject)
+      console.log('nodesToAnimate => ', nodesToAnimate)
+      console.log('nodes => ', nodes)
+      console.log('node => ', this.board.node)
     },
     clearPath(){
       let relevantStatuses = ["wall", "start", "target", "object"];
@@ -237,6 +241,171 @@ export default {
           }
         }
       }
+    },
+
+    //以下均未處理
+    addShortestPath(targetNodeId, startNodeId, object) {
+      let currentNode = this.nodes[this.nodes[targetNodeId].previousNode];
+      if (object) {
+        while (currentNode.id !== startNodeId) {
+          this.objectShortestPathNodesToAnimate.unshift(currentNode);
+          currentNode.relatesToObject = true;
+          currentNode = this.nodes[currentNode.previousNode];
+        }
+      } else {
+        while (currentNode.id !== startNodeId) {
+          this.shortestPathNodesToAnimate.unshift(currentNode);
+          currentNode = this.nodes[currentNode.previousNode];
+        }
+      }
+    },
+    drawShortestPathTimeout(targetNodeId, startNodeId, type, object) {
+      let board = this;
+      let currentNode;
+      let secondCurrentNode;
+      let currentNodesToAnimate;
+
+      if (board.currentAlgorithm !== "bidirectional") {
+        currentNode = board.nodes[board.nodes[targetNodeId].previousNode];
+        if (object) {
+          board.objectShortestPathNodesToAnimate.push("object");
+          currentNodesToAnimate = board.objectShortestPathNodesToAnimate.concat(board.shortestPathNodesToAnimate);
+        } else {
+          currentNodesToAnimate = [];
+          while (currentNode.id !== startNodeId) {
+            currentNodesToAnimate.unshift(currentNode);
+            currentNode = board.nodes[currentNode.previousNode];
+          }
+        }
+      } else {
+        if (board.middleNode !== board.target && board.middleNode !== board.start) {
+          currentNode = board.nodes[board.nodes[board.middleNode].previousNode];
+          secondCurrentNode = board.nodes[board.nodes[board.middleNode].otherpreviousNode];
+          if (secondCurrentNode.id === board.target) {
+            board.nodes[board.target].direction = getDistance(board.nodes[board.middleNode], board.nodes[board.target])[2];
+          }
+          if (object) {
+
+          } else {
+            currentNodesToAnimate = [];
+            board.nodes[board.middleNode].direction = getDistance(currentNode, board.nodes[board.middleNode])[2];
+            while (currentNode.id !== startNodeId) {
+              currentNodesToAnimate.unshift(currentNode);
+              currentNode = board.nodes[currentNode.previousNode];
+            }
+            currentNodesToAnimate.push(board.nodes[board.middleNode]);
+            while (secondCurrentNode.id !== targetNodeId) {
+              if (secondCurrentNode.otherdirection === "left") {
+                secondCurrentNode.direction = "right";
+              } else if (secondCurrentNode.otherdirection === "right") {
+                secondCurrentNode.direction = "left";
+              } else if (secondCurrentNode.otherdirection === "up") {
+                secondCurrentNode.direction = "down";
+              } else if (secondCurrentNode.otherdirection === "down") {
+                secondCurrentNode.direction = "up";
+              }
+              currentNodesToAnimate.push(secondCurrentNode);
+              if (secondCurrentNode.otherpreviousNode === targetNodeId) {
+                board.nodes[board.target].direction = getDistance(secondCurrentNode, board.nodes[board.target])[2];
+              }
+              secondCurrentNode = board.nodes[secondCurrentNode.otherpreviousNode]
+            }
+          }
+        } else {
+          currentNodesToAnimate = [];
+          let target = board.nodes[board.target];
+          currentNodesToAnimate.push(board.nodes[target.previousNode], target);
+        }
+      }
+      timeout(0);
+
+      function timeout(index) {
+        if (!currentNodesToAnimate.length) currentNodesToAnimate.push(board.nodes[board.start]);
+        setTimeout(function () {
+          if (index === 0) {
+            shortestPathChange(currentNodesToAnimate[index]);
+          } else if (index < currentNodesToAnimate.length) {
+            shortestPathChange(currentNodesToAnimate[index], currentNodesToAnimate[index - 1]);
+          } else if (index === currentNodesToAnimate.length) {
+            shortestPathChange(board.nodes[board.target], currentNodesToAnimate[index - 1], "isActualTarget");
+          }
+          if (index > currentNodesToAnimate.length) {
+            board.toggleButtons();
+            return;
+          }
+          timeout(index + 1);
+        }, 40)
+      }
+
+      function shortestPathChange(currentNode, previousNode, isActualTarget) {
+        if (currentNode === "object") {
+          let element = document.getElementById(board.object);
+          element.className = "objectTransparent";
+        } else if (currentNode.id !== board.start) {
+          if (currentNode.id !== board.target || currentNode.id === board.target && isActualTarget) {
+            let currentHTMLNode = document.getElementById(currentNode.id);
+            if (type === "unweighted") {
+              currentHTMLNode.className = "shortest-path-unweighted";
+            } else {
+              let direction;
+              if (currentNode.relatesToObject && !currentNode.overwriteObjectRelation && currentNode.id !== board.target) {
+                direction = "storedDirection";
+                currentNode.overwriteObjectRelation = true;
+              } else {
+                direction = "direction";
+              }
+              if (currentNode[direction] === "up") {
+                currentHTMLNode.className = "shortest-path-up";
+              } else if (currentNode[direction] === "down") {
+                currentHTMLNode.className = "shortest-path-down";
+              } else if (currentNode[direction] === "right") {
+                currentHTMLNode.className = "shortest-path-right";
+              } else if (currentNode[direction] === "left") {
+                currentHTMLNode.className = "shortest-path-left";
+              } else {
+                currentHTMLNode.className = "shortest-path";
+              }
+            }
+          }
+        }
+        if (previousNode) {
+          if (previousNode !== "object" && previousNode.id !== board.target && previousNode.id !== board.start) {
+            let previousHTMLNode = document.getElementById(previousNode.id);
+            previousHTMLNode.className = previousNode.weight === 15 ? "shortest-path weight" : "shortest-path";
+          }
+        } else {
+          let element = document.getElementById(board.start);
+          element.className = "startTransparent";
+        }
+      }
+    },
+    reset(objectNotTransparent) {
+      this.nodes[this.start].status = "start";
+      document.getElementById(this.start).className = "startTransparent";
+      this.nodes[this.target].status = "target";
+      if (this.object) {
+        this.nodes[this.object].status = "object";
+        if (objectNotTransparent) {
+          document.getElementById(this.object).className = "visitedObjectNode";
+        } else {
+          document.getElementById(this.object).className = "objectTransparent";
+        }
+      }
+    },
+    clearNodeStatuses() {
+      Object.keys(this.nodes).forEach(id => {
+        let currentNode = this.nodes[id];
+        currentNode.previousNode = null;
+        currentNode.distance = Infinity;
+        currentNode.totalDistance = Infinity;
+        currentNode.heuristicDistance = null;
+        currentNode.storedDirection = currentNode.direction;
+        currentNode.direction = null;
+        let relevantStatuses = ["wall", "start", "target", "object"];
+        if (!relevantStatuses.includes(currentNode.status)) {
+          currentNode.status = "unvisited";
+        }
+      })
     }
   },
   computed: {}
