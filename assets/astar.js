@@ -48,7 +48,7 @@ function astar(nodes, start, target, nodesToAnimate, boardArray, name, heuristic
         }
         
         nodesToAnimate.push(currentNode);
-        currentNode.isVisited = 'visited';
+        currentNode.isVisited = true;
         if (currentNode.id === target.id) {
             return "success!";
         }

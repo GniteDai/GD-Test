@@ -39,7 +39,11 @@ board.prototype.initialise = function(){
                 column: j,
                 status: getRandomWall(),
                 weight: 0,
-                isVisited: '',
+                isVisited: false,
+                isVisitedWeight: false,
+                isWeightShortestPath: false,
+                isShortestPath: false,
+                isCurrent: false,
             }
             row_data.push(column_data)
         }
@@ -143,7 +147,7 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
             } else if (currentNode[direction] === "left") {
               currentHTMLNode.classList.add("shortest-path-left");
             } else {
-              currentHTMLNode.classList.add("shortest-path");
+                currentNode.isShortestPath = true;
             }
           }
         }
@@ -151,7 +155,11 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
       if (previousNode) {
         if (previousNode !== "object" && previousNode.id !== board.target && previousNode.id !== self.start.id) {
           let previousHTMLNode = document.getElementById(previousNode.id);
-          previousHTMLNode.className = previousNode.weight === 15 ? "shortest-path weight" : "shortest-path";
+          if(previousNode.weight === 15){
+            previousNode.isWeightShortestPath = true;
+          }else{
+            previousNode.isShortestPath = true;
+          }
         }
       } else {
         let element = document.getElementById(self.start.id);
@@ -160,9 +168,32 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
     }
 },
 board.prototype.reset = function(objectNotTransparent) {
-    this.nodes[this.start.row][this.start.column] = "start";
+    this.nodes[this.start.row][this.start.column].status = "start";
     document.getElementById(this.start.id).classList.add("startTransparent");
     this.nodes[this.target.row][this.target.column].status = "target";
+
+    // let relevantStatuses = ["wall", "start", "target", "object"];
+    // for(let row of this.nodes){
+    //     for(let col of row){
+    //         col.isVisited = false;
+    //         col.isCurrent = false;
+    //         col.isShortestPath = false;
+    //         col.previousNode = null;
+    //         col.distance = Infinity;
+    //         col.totalDistance = Infinity;
+    //         col.heuristicDistance = null;
+    //         col.direction = null;
+    //         col.storedDirection = null;
+    //         col.relatesToObject = false;
+    //         col.overwriteObjectRelation = false;
+    //         col.otherpreviousNode = null;
+    //         col.otherdistance = Infinity;
+    //         col.otherdirection = null;
+    //         if (!relevantStatuses.includes(col.status) && col.weight !== 15) {
+    //             col.status = "unvisited";
+    //         }
+    //     }
+    // }
 }
 
 function getRandomWall(){

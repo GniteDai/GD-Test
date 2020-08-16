@@ -43,7 +43,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
           board.nodesToAnimate = [];
           if (success) {
             if (document.getElementById(board_target).className !== "visitedTargetNodeBlue") {
-              document.getElementById(board_target).className = "visitedTargetNodeBlue";
+              document.getElementById(board_target).classList.add("visitedTargetNodeBlue");
             }
             if (board.isObject) {
               board.addShortestPath(board_target, board.object);
@@ -75,7 +75,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
           }
         }
         if (board.currentAlgorithm === "bidirectional") {
-          document.getElementById(board_target).className = "visitedTargetNodeBlue";
+          document.getElementById(board_target).classList.add("visitedTargetNodeBlue");
         }
         change(nodes[index])
       } else if (index === nodes.length - 1 && board.currentAlgorithm === "bidirectional") {
@@ -91,87 +91,96 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
     let currentHTMLNode = document.getElementById(currentNode.id);
     let relevantClassNames = ["start", "target", "object", "visitedStartNodeBlue", "visitedStartNodePurple", "visitedObjectNode", "visitedTargetNodePurple", "visitedTargetNodeBlue"];
     if (!relevantClassNames.includes(currentHTMLNode.className)) {
-      currentHTMLNode.className = !bidirectional ?
-        "current" : currentNode.weight === 15 ?
-          "visited weight" : "visited";
+      if(!bidirectional){
+        currentNode.isCurrent = true
+      }else if(currentNode.weight === 15){
+        currentNode.isVisitedWeight = true
+      }else{
+        currentNode.isVisited = true
+      }
+      // currentHTMLNode.classList.add(!bidirectional ? "current" : currentNode.weight === 15 ? "visited weight" : "visited")
     }
     if (currentHTMLNode.className === "visitedStartNodePurple" && !object) {
-      currentHTMLNode.className = "visitedStartNodeBlue";
+      currentHTMLNode.classList.add("visitedStartNodeBlue");
     }
     if (currentHTMLNode.className === "target" && object) {
-      currentHTMLNode.className = "visitedTargetNodePurple";
+      currentHTMLNode.classList.add("visitedTargetNodePurple");
     }
     if (previousNode) {
       let previousHTMLNode = document.getElementById(previousNode.id);
       if (!relevantClassNames.includes(previousHTMLNode.className)) {
         if (object) {
-          previousHTMLNode.className = previousNode.weight === 15 ? "visitedobject weight" : "visitedobject";
+          previousHTMLNode.classList.add(previousNode.weight === 15 ? "visitedobject weight" : "visitedobject");
         } else {
-          previousHTMLNode.className = previousNode.weight === 15 ? "visited weight" : "visited";
-        }
-      }
-    }
-  }
-
-  function shortestPathTimeout(index) {
-    setTimeout(function () {
-      if (index === shortestNodes.length){
-        board.reset();
-        if (object) {
-          shortestPathChange(board.nodes[board_target], shortestNodes[index - 1]);
-          board.objectShortestPathNodesToAnimate = [];
-          board.shortestPathNodesToAnimate = [];
-          board.clearNodeStatuses();
-          let newSuccess;
-          if (type === "weighted") {
-            // newSuccess = weightedSearchAlgorithm(board.nodes, board.object, board.target, board.nodesToAnimate, board.boardArray, algorithm);
-            newSuccess = astar(board.nodes, board.object, board.target, board.nodesToAnimate, board.boardArray, algorithm);
-          } else {
-            // newSuccess = unweightedSearchAlgorithm(board.nodes, board.object, board.target, board.nodesToAnimate, board.boardArray, algorithm);
+          if(previousNode.weight === 15){
+            previousNode.isVisitedWeight = true;
+          }else{
+            previousNode.isVisited = true;
           }
-          launchAnimations(board, newSuccess, type);
-          return;
-        } else {
-          shortestPathChange(board.nodes[board_target], shortestNodes[index - 1]);
-          board.objectShortestPathNodesToAnimate = [];
-          board.shortestPathNodesToAnimate = [];
-          return;
         }
-      } else if (index === 0) {
-        shortestPathChange(shortestNodes[index])
-      } else {
-        shortestPathChange(shortestNodes[index], shortestNodes[index - 1]);
       }
-      shortestPathTimeout(index + 1);
-    }, 40);
+    }
   }
 
-  function shortestPathChange(currentNode, previousNode) {
-    let currentHTMLNode = document.getElementById(currentNode.id);
-    if (type === "unweighted") {
-      currentHTMLNode.className = "shortest-path-unweighted";
-    } else {
-      if (currentNode.direction === "up") {
-        currentHTMLNode.className = "shortest-path-up";
-      } else if (currentNode.direction === "down") {
-        currentHTMLNode.className = "shortest-path-down";
-      } else if (currentNode.direction === "right") {
-        currentHTMLNode.className = "shortest-path-right";
-      } else if (currentNode.direction === "left") {
-        currentHTMLNode.className = "shortest-path-left";
-      } else if (currentNode.direction = "down-right") {
-        currentHTMLNode.className = "wall"
-      }
-    }
-    if (previousNode) {
-      let previousHTMLNode = document.getElementById(previousNode.id);
-      previousHTMLNode.className = "shortest-path";
-    } else {
-      let element = document.getElementById(board_start);
-      element.className = "shortest-path";
-      element.removeAttribute("style");
-    }
-  }
+  // function shortestPathTimeout(index) {
+  //   setTimeout(function () {
+  //     if (index === shortestNodes.length){
+  //       board.reset();
+  //       if (object) {
+  //         shortestPathChange(board.nodes[board_target], shortestNodes[index - 1]);
+  //         board.objectShortestPathNodesToAnimate = [];
+  //         board.shortestPathNodesToAnimate = [];
+  //         board.clearNodeStatuses();
+  //         let newSuccess;
+  //         if (type === "weighted") {
+  //           // newSuccess = weightedSearchAlgorithm(board.nodes, board.object, board.target, board.nodesToAnimate, board.boardArray, algorithm);
+  //           newSuccess = astar(board.nodes, board.object, board.target, board.nodesToAnimate, board.boardArray, algorithm);
+  //         } else {
+  //           // newSuccess = unweightedSearchAlgorithm(board.nodes, board.object, board.target, board.nodesToAnimate, board.boardArray, algorithm);
+  //         }
+  //         launchAnimations(board, newSuccess, type);
+  //         return;
+  //       } else {
+  //         shortestPathChange(board.nodes[board_target], shortestNodes[index - 1]);
+  //         board.objectShortestPathNodesToAnimate = [];
+  //         board.shortestPathNodesToAnimate = [];
+  //         return;
+  //       }
+  //     } else if (index === 0) {
+  //       shortestPathChange(shortestNodes[index])
+  //     } else {
+  //       shortestPathChange(shortestNodes[index], shortestNodes[index - 1]);
+  //     }
+  //     shortestPathTimeout(index + 1);
+  //   }, 40);
+  // }
+
+  // function shortestPathChange(currentNode, previousNode) {
+  //   let currentHTMLNode = document.getElementById(currentNode.id);
+  //   if (type === "unweighted") {
+  //     currentHTMLNode.className = "shortest-path-unweighted";
+  //   } else {
+  //     if (currentNode.direction === "up") {
+  //       currentHTMLNode.className = "shortest-path-up";
+  //     } else if (currentNode.direction === "down") {
+  //       currentHTMLNode.className = "shortest-path-down";
+  //     } else if (currentNode.direction === "right") {
+  //       currentHTMLNode.className = "shortest-path-right";
+  //     } else if (currentNode.direction === "left") {
+  //       currentHTMLNode.className = "shortest-path-left";
+  //     } else if (currentNode.direction = "down-right") {
+  //       currentHTMLNode.className = "wall"
+  //     }
+  //   }
+  //   if (previousNode) {
+  //     let previousHTMLNode = document.getElementById(previousNode.id);
+  //     previousHTMLNode.className = "shortest-path";
+  //   } else {
+  //     let element = document.getElementById(board_start);
+  //     element.className = "shortest-path";
+  //     element.removeAttribute("style");
+  //   }
+  // }
 
   timeout(0);
 };

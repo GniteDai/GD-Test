@@ -14,7 +14,16 @@
             <td v-for="(column, col_index) in row" 
               :key="`${row_index}-${col_index}`" 
               :id="`${row_index}-${col_index}`" 
-              :class="{isStart:column.status === 'start', isTarget:column.status === 'target', isObject:column.status === 'object', isWall:column.status === 'wall', isNormal:column.status === 'normal', isVisited:column.isVisited === 'visited'}" 
+              :class="{
+                isStart:column.status === 'start', 
+                isTarget:column.status === 'target', 
+                isObject:column.status === 'object', 
+                isWall:column.status === 'wall', 
+                isNormal:column.status === 'normal', 
+                isVisited:column.isVisited === true,
+                'shortest-path': column.isShortestPath === true,
+
+                }" 
               @mousedown="eventMouseDown($event, column)" 
               @mouseup="eventMouseUp(column)" 
               @mouseenter="eventMouseEnter(column)" 
@@ -59,6 +68,7 @@ export default {
       this.initialise(row, column)
     },
     eventMouseDown(e, node){
+      this.clearPath()
       e.preventDefault();
       if(!this.board.mouse.donw){
         this.board.mouse.donw = true
@@ -101,6 +111,7 @@ export default {
     },
     eventMouseEnter(node){
       if(this.board.mouse.donw){
+        node.isShortestPath = false
         let status = ["start", "target", "object"];
         if(!status.includes(this.board.mouse.status)){
           if(!status.includes(node.status)){
@@ -133,10 +144,12 @@ export default {
       }
     },
     clearBoard(e){
+      this.clearPath();
       for(let row of this.board.nodes){
         for(let column of row){
           if(column.status === 'wall'){
             column.status = 'normal';
+            column.isVisited = false;
           }
         }
       }
@@ -145,6 +158,9 @@ export default {
       let relevantStatuses = ["wall", "start", "target", "object"];
       for(let row of this.board.nodes){
         for(let col of row){
+          col.isVisited = false;
+          col.isCurrent = false;
+          col.isShortestPath = false;
           col.previousNode = null;
           col.distance = Infinity;
           col.totalDistance = Infinity;
@@ -157,23 +173,7 @@ export default {
           col.otherdistance = Infinity;
           col.otherdirection = null;
           if (!relevantStatuses.includes(col.status) && col.weight !== 15) {
-            col.status = "unvisited";
-          }
-        }
-      }
-    },
-    clearNodeStatuses() {
-      let relevantStatuses = ["wall", "start", "target", "object"];
-      for(let row of this.board.nodes){
-        for(let col of row){
-          col.previousNode = null;
-          col.distance = Infinity;
-          col.totalDistance = Infinity;
-          col.heuristicDistance = null;
-          col.storedDirection = col.direction;
-          col.direction = null;
-          if (!relevantStatuses.includes(col.status)) {
-            col.status = "unvisited";
+            // col.status = "unvisited";
           }
         }
       }
@@ -331,7 +331,6 @@ export default {
   }
   .isVisited {
     border: 0px;
-    background-color: yellowgreen;
     background-color: teal;
     animation-name: visitedAnimation;
     animation-duration: 0.3s;
@@ -483,5 +482,9 @@ export default {
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
     animation-play-state: running;
+  }
+  .current{
+    border: 1px solid rgb(175, 216, 248);
+    background-color: rgb(255, 254, 106)
   }
 </style>
