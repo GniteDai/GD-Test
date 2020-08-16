@@ -8,6 +8,7 @@ function board(row, column) {
     this.boardArray = [],
     this.objectShortestPathNodesToAnimate = [],
     this.shortestPathNodesToAnimate = [],
+    this.buttonsOn = false;
     this.start = {
         id: '',
         row: 0,
@@ -44,6 +45,7 @@ board.prototype.initialise = function(){
                 isWeightShortestPath: false,
                 isShortestPath: false,
                 isCurrent: false,
+                isStartTransparent: false,
             }
             row_data.push(column_data)
         }
@@ -169,31 +171,8 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
 },
 board.prototype.reset = function(objectNotTransparent) {
     this.nodes[this.start.row][this.start.column].status = "start";
-    document.getElementById(this.start.id).classList.add("startTransparent");
+    this.nodes[this.start.row][this.start.column].isStartTransparent = true
     this.nodes[this.target.row][this.target.column].status = "target";
-
-    // let relevantStatuses = ["wall", "start", "target", "object"];
-    // for(let row of this.nodes){
-    //     for(let col of row){
-    //         col.isVisited = false;
-    //         col.isCurrent = false;
-    //         col.isShortestPath = false;
-    //         col.previousNode = null;
-    //         col.distance = Infinity;
-    //         col.totalDistance = Infinity;
-    //         col.heuristicDistance = null;
-    //         col.direction = null;
-    //         col.storedDirection = null;
-    //         col.relatesToObject = false;
-    //         col.overwriteObjectRelation = false;
-    //         col.otherpreviousNode = null;
-    //         col.otherdistance = Infinity;
-    //         col.otherdirection = null;
-    //         if (!relevantStatuses.includes(col.status) && col.weight !== 15) {
-    //             col.status = "unvisited";
-    //         }
-    //     }
-    // }
 }
 
 function getRandomWall(){

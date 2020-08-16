@@ -22,8 +22,8 @@
                 isNormal:column.status === 'normal', 
                 isVisited:column.isVisited === true,
                 'shortest-path': column.isShortestPath === true,
-
-                }" 
+                startTransparent: column.isStartTransparent === true
+              }" 
               @mousedown="eventMouseDown($event, column)" 
               @mouseup="eventMouseUp(column)" 
               @mouseenter="eventMouseEnter(column)" 
@@ -70,69 +70,78 @@ export default {
     eventMouseDown(e, node){
       this.clearPath()
       e.preventDefault();
-      if(!this.board.mouse.donw){
-        this.board.mouse.donw = true
-        switch(node.status){
-          case 'start': {
-            this.board.mouse.status = 'start'
-            break;
-          }
-          case 'target': {
-            this.board.mouse.status = 'target'
-            break;
-          }
-          case 'object': {
-            this.board.mouse.status = 'object'
-            break;
-          }
-          case 'wall': {
-            this.board.mouse.status = 'wall'
-            node.status = 'normal'
-            break;
-          }
-          case 'normal': {
-            this.board.mouse.status = 'normal'
-            node.status = 'wall'
-            break;
-          }
-          default: {
-            break;
+      if(!this.board.buttonsOn){
+        if(!this.board.mouse.donw){
+          this.board.mouse.donw = true
+          switch(node.status){
+            case 'start': {
+              this.board.mouse.status = 'start'
+              break;
+            }
+            case 'target': {
+              this.board.mouse.status = 'target'
+              break;
+            }
+            case 'object': {
+              this.board.mouse.status = 'object'
+              break;
+            }
+            case 'wall': {
+              this.board.mouse.status = 'wall'
+              node.status = 'normal'
+              break;
+            }
+            case 'normal': {
+              this.board.mouse.status = 'normal'
+              node.status = 'wall'
+              break;
+            }
+            default: {
+              break;
+            }
           }
         }
       }
     },
     eventMouseUp(node){
-      this.board.mouse.donw = false;
-      let status = ["start", "target", "object"];
-      if(status.includes(this.board.mouse.status)){
-        node.status = this.board.mouse.status
-        this.changeStartOrTarget(node.status, node.row, node.column)
-      }
-    },
-    eventMouseEnter(node){
-      if(this.board.mouse.donw){
-        node.isShortestPath = false
+      if(!this.board.buttonsOn){
+        this.board.mouse.donw = false;
         let status = ["start", "target", "object"];
-        if(!status.includes(this.board.mouse.status)){
-          if(!status.includes(node.status)){
-            node.status = node.status === 'wall' ? 'normal' : 'wall'
-          }
-        }else{
-          this.board.mouse.previouslyNode = node.status === 'wall' ? 'wall' : 'normal'
+        if(status.includes(this.board.mouse.status)){
           node.status = this.board.mouse.status
           this.changeStartOrTarget(node.status, node.row, node.column)
         }
       }
     },
-    eventMouseLeave(node){
-      if(this.board.mouse.donw){
-        let status = ["start", "target", "object"];
-        if(!status.includes(this.board.mouse.status)){
-          if(!status.includes(node.status)){
-            node.status = node.status === 'wall' ? 'wall' : 'normal'
+    eventMouseEnter(node){
+      if(!this.board.buttonsOn){
+        if(this.board.mouse.donw){
+          node.isShortestPath = false
+          let status = ["start", "target", "object"];
+          if(!status.includes(this.board.mouse.status)){
+            if(!status.includes(node.status)){
+              node.status = node.status === 'wall' ? 'normal' : 'wall'
+            }
+          }else{
+            this.board.mouse.previouslyNode = node.status === 'wall' ? 'wall' : 'normal'
+            node.status = this.board.mouse.status
+            this.changeStartOrTarget(node.status, node.row, node.column)
           }
-        }else{
-          node.status = this.board.mouse.previouslyNode === 'wall' ? 'wall' : 'normal'
+        }
+      }
+    },
+    eventMouseLeave(node){
+      if(!this.board.buttonsOn){
+        if(this.board.mouse.donw){
+          let status = ["start", "target", "object"];
+          if(!status.includes(this.board.mouse.status)){
+            if(!status.includes(node.status)){
+              node.status = node.status === 'wall' ? 'wall' : 'normal'
+            }
+          }else{
+            node.status = this.board.mouse.previouslyNode === 'wall' ? 'wall' : 'normal'
+            node.isStartTransparent = false;
+          }
         }
       }
     },
@@ -179,7 +188,10 @@ export default {
       }
     },
     runAlgorithm(){
-      this.runAstarAlgorithm()
+      if(!this.board.buttonsOn){
+        this.board.buttonsOn = true
+        this.runAstarAlgorithm()
+      }
     },
 
     runAstarAlgorithm(){
@@ -189,6 +201,7 @@ export default {
       let nodesToAnimate = this.board.nodesToAnimate
       let astarAlgorithm = astar(this.board.nodes, start, target, nodesToAnimate, this.board.boardArray, 'astar', undefined)
       launchAnimations(this.board, astarAlgorithm);
+      this.board.buttonsOn = false;
     },
   },
   computed: {}
