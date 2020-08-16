@@ -8,15 +8,16 @@ const astar = require("~/assets/astar.js")
 
 function launchAnimations(board, success, type, object, algorithm, heuristic) {
   let nodes = object ? board.objectNodesToAnimate.slice(0) : board.nodesToAnimate.slice(0);
-  let speed = board.speed === "fast" ? 0 : board.speed === "average" ? 100 : 500;
   let shortestNodes;
+  let board_start = board.start.row + '-' + board.start.column
+  let board_target = board.target.row + '-' + board.target.column
   function timeout(index) {
     setTimeout(function () {
       if (index === nodes.length) {
         if (object) {
           board.objectNodesToAnimate = [];
           if (success) {
-            board.addShortestPath(board.object, board.start, "object");
+            board.addShortestPath(board.object, board_start, "object");
             board.clearNodeStatuses();
             let newSuccess;
             if (board.currentAlgorithm === "bidirectional") {
@@ -41,17 +42,17 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
         } else {
           board.nodesToAnimate = [];
           if (success) {
-            if (document.getElementById(board.target).className !== "visitedTargetNodeBlue") {
-              document.getElementById(board.target).className = "visitedTargetNodeBlue";
+            if (document.getElementById(board_target).className !== "visitedTargetNodeBlue") {
+              document.getElementById(board_target).className = "visitedTargetNodeBlue";
             }
             if (board.isObject) {
-              board.addShortestPath(board.target, board.object);
-              board.drawShortestPathTimeout(board.target, board.object, type, "object");
+              board.addShortestPath(board_target, board.object);
+              board.drawShortestPathTimeout(board_target, board.object, type, "object");
               board.objectShortestPathNodesToAnimate = [];
               board.shortestPathNodesToAnimate = [];
               board.reset("objectNotTransparent");
             } else {
-              board.drawShortestPathTimeout(board.target, board.start, type);
+              board.drawShortestPathTimeout(board_target, board_start, type);
               board.objectShortestPathNodesToAnimate = [];
               board.shortestPathNodesToAnimate = [];
               board.reset();
@@ -67,14 +68,14 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
         }
       } else if (index === 0) {
         if (object) {
-          document.getElementById(board.start).className = "visitedStartNodePurple";
+          document.getElementById(board_start).className = "visitedStartNodePurple";
         } else {
-          if (document.getElementById(board.start).className !== "visitedStartNodePurple") {
-            document.getElementById(board.start).className = "visitedStartNodeBlue";
+          if (document.getElementById(board_start).className !== "visitedStartNodePurple") {
+            document.getElementById(board_start).classList.add("visitedStartNodeBlue");
           }
         }
         if (board.currentAlgorithm === "bidirectional") {
-          document.getElementById(board.target).className = "visitedTargetNodeBlue";
+          document.getElementById(board_target).className = "visitedTargetNodeBlue";
         }
         change(nodes[index])
       } else if (index === nodes.length - 1 && board.currentAlgorithm === "bidirectional") {
@@ -83,7 +84,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
         change(nodes[index], nodes[index - 1]);
       }
       timeout(index + 1);
-    }, speed);
+    }, 0);
   }
 
   function change(currentNode, previousNode, bidirectional) {
@@ -117,7 +118,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
       if (index === shortestNodes.length){
         board.reset();
         if (object) {
-          shortestPathChange(board.nodes[board.target], shortestNodes[index - 1]);
+          shortestPathChange(board.nodes[board_target], shortestNodes[index - 1]);
           board.objectShortestPathNodesToAnimate = [];
           board.shortestPathNodesToAnimate = [];
           board.clearNodeStatuses();
@@ -131,7 +132,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
           launchAnimations(board, newSuccess, type);
           return;
         } else {
-          shortestPathChange(board.nodes[board.target], shortestNodes[index - 1]);
+          shortestPathChange(board.nodes[board_target], shortestNodes[index - 1]);
           board.objectShortestPathNodesToAnimate = [];
           board.shortestPathNodesToAnimate = [];
           return;
@@ -166,7 +167,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
       let previousHTMLNode = document.getElementById(previousNode.id);
       previousHTMLNode.className = "shortest-path";
     } else {
-      let element = document.getElementById(board.start);
+      let element = document.getElementById(board_start);
       element.className = "shortest-path";
       element.removeAttribute("style");
     }
