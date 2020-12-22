@@ -20,7 +20,7 @@
                 isObject:column.status === 'object', 
                 isWall:column.status === 'wall', 
                 isNormal:column.status === 'normal', 
-                isVisited:column.isVisited === true,
+                
                 'shortest-path': column.isShortestPath === true,
                 startTransparent: column.isStartTransparent === true
               }" 
@@ -182,13 +182,15 @@ export default {
           if (!relevantStatuses.includes(col.status) && col.weight !== 15) {
             // col.status = "unvisited";
           }
-          let currentNode = document.getElementById(col.id);
-          currentNode.classList.remove('isVisited');
-          currentNode.classList.remove('visitedTargetNodeBlue');
-          currentNode.classList.remove('shortest-path-right');
-          currentNode.classList.remove('shortest-path-left');
-          currentNode.classList.remove('shortest-path-up');
-          currentNode.classList.remove('shortest-path-down');
+          let currentNode = document.getElementById(col.id)
+          currentNode.classList.remove('visited')
+          currentNode.classList.remove('current')
+          if(currentNode.classList.contains('visitedStartNodeBlue')){
+            currentNode.className = "isStart"
+          }
+          if(currentNode.classList.contains('visitedTargetNodeBlue')){
+            currentNode.className = "isTarget"
+          }
         }
       }
     },
@@ -205,7 +207,7 @@ export default {
       let nodesToAnimate = this.board.nodesToAnimate
       let astarAlgorithm = astar(this.board.nodes, start, target, nodesToAnimate, this.board.boardArray, 'astar')
       launchAnimations(this.board, astarAlgorithm);
-      this.board.buttonsOn = false;
+      // this.board.buttonsOn = false;
     },
   },
   computed: {}
@@ -306,20 +308,6 @@ export default {
     animation-fill-mode: forwards;
     animation-play-state: running;
   }
-  @keyframes wallAnimation {
-    0% {
-      transform: scale(.3);
-      background-color: rgb(12, 53, 71);
-    }
-    50% {
-      transform: scale(1.2);
-      background-color: rgb(12, 53, 71);
-    }
-    100% {
-      transform: scale(1.0);
-      background-color: rgb(12, 53, 71);
-    }
-  }
   .isNormal {
     background-color: white;
   }
@@ -338,10 +326,8 @@ export default {
     animation-fill-mode: forwards;
     animation-play-state: running;
   }
-  .isTarget {
-    border: 0px;
-    background-color: red;
-    /* background:url("../static/image/triangletwo-down.svg");
+  .isTarget{
+    background-image: url("../../../static/image/circle.svg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -352,7 +338,7 @@ export default {
     animation-direction: alternate;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
-    animation-play-state: running; */
+    animation-play-state: running;
   }
   .isObject {
     border: 0px;
@@ -370,34 +356,6 @@ export default {
     animation-fill-mode: forwards;
     animation-play-state: running;
   }
-  @keyframes visitedAnimation {
-    0% {
-      transform: scale(.3);
-      background-color: yellowgreen;
-    }
-    50% {
-      transform: scale(1.2);
-      background-color: yellowgreen;
-    }
-    100% {
-      transform: scale(1.0);
-      background-color: yellowgreen;
-    }
-  }
-  @keyframes specialNodes {
-    0% {
-      transform: scale(.3);
-    }
-
-    50% {
-      transform: scale(1.2);
-    }
-
-    100% {
-      transform: scale(1.0);
-    }
-  }
-
   .startTransparent {
     opacity: 0.5;
     background-image:url("../../../static/image/triangletwo-right.svg");
@@ -424,22 +382,6 @@ export default {
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
     animation-play-state: running;
-  }
-  @keyframes triangletwo {
-    0% {
-      transform: scale(.6);
-      background-color: rgb(255, 254, 106);
-    }
-
-    50% {
-      transform: scale(1.2);
-      background-color: rgb(255, 254, 106);
-    }
-
-    100% {
-      transform: scale(1.0);
-      background-color: rgb(255, 254, 106);
-    }
   }
   .visited{
     border: 1px solid rgb(175, 216, 248);
@@ -515,5 +457,147 @@ export default {
   .current{
     border: 1px solid rgb(175, 216, 248);
     background-color: rgb(255, 254, 106)
+  }
+  .visitedStartNodeBlue {
+    background-image:url("../../../static/image/triangletwo-right.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    animation-name: visitedStartNodeBlueAnimation;
+    animation-duration: 2.0s;
+    animation-timing-function: ease-out;
+    animation-delay: 0;
+    animation-direction: alternate;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-play-state: running;
+  }
+  .visitedStartNodePurple {
+    background:url("../../../static/image/triangletwo-right.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    animation-name: visitedStartNodePurpleAnimation;
+    animation-duration: 2.0s;
+    animation-timing-function: ease-out;
+    animation-delay: 0;
+    animation-direction: alternate;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-play-state: running;
+  }
+  .visitedTargetNodeBlue {
+    background-image: url("../../../static/image/circle.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    animation-name: visitedStartNodeBlueAnimation;
+    animation-duration: 2.0s;
+    animation-timing-function: ease-out;
+    animation-delay: 0;
+    animation-direction: alternate;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-play-state: running;
+  }
+  .visitedTargetNodePurple {
+    background-image: url("../../../static/image/circle.svg");
+    animation-name: visitedStartNodePurpleAnimation;
+  }
+  @keyframes visitedStartNodePurpleAnimation {
+    0% {
+      transform: scale(.3);
+      background-color: rgba(41, 4, 24, 0.75);
+      border-radius: 100%;
+    }
+    50% {
+      background-color: rgba(97, 0, 20, 0.75);
+    }
+    75% {
+      transform: scale(1.2);
+      background-color: rgba(216, 5, 141, 0.75)
+    }
+    100% {
+      transform: scale(1.0);
+      background-color: rgba(178, 67, 255, 0.75);
+    }
+  }
+  @keyframes visitedStartNodeBlueAnimation {
+    0% {
+      transform: scale(.3);
+      background-color: rgba(0, 0, 66, 0.75);
+      border-radius: 100%;
+    }
+
+    50% {
+      background-color: rgba(17, 104, 217, 0.75);
+    }
+
+    75% {
+      transform: scale(1.2);
+      background-color: rgba(0, 217, 159, 0.75);
+    }
+
+    100% {
+      transform: scale(1.0);
+      background-color: rgba(0, 190, 218, 0.75);
+    }
+  }
+  @keyframes triangletwo {
+    0% {
+      transform: scale(.6);
+      background-color: rgb(255, 254, 106);
+    }
+
+    50% {
+      transform: scale(1.2);
+      background-color: rgb(255, 254, 106);
+    }
+
+    100% {
+      transform: scale(1.0);
+      background-color: rgb(255, 254, 106);
+    }
+  }
+  @keyframes wallAnimation {
+    0% {
+      transform: scale(.3);
+      background-color: rgb(12, 53, 71);
+    }
+    50% {
+      transform: scale(1.2);
+      background-color: rgb(12, 53, 71);
+    }
+    100% {
+      transform: scale(1.0);
+      background-color: rgb(12, 53, 71);
+    }
+  }
+  @keyframes visitedAnimation {
+    0% {
+      transform: scale(.3);
+      background-color: yellowgreen;
+    }
+    50% {
+      transform: scale(1.2);
+      background-color: yellowgreen;
+    }
+    100% {
+      transform: scale(1.0);
+      background-color: yellowgreen;
+    }
+  }
+  @keyframes specialNodes {
+    0% {
+      transform: scale(.3);
+    }
+
+    50% {
+      transform: scale(1.2);
+    }
+
+    100% {
+      transform: scale(1.0);
+    }
   }
 </style>

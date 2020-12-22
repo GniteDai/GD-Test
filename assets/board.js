@@ -1,29 +1,30 @@
 let _ = require('lodash')
 function board(row, column) {
-    this.row = row
-    this.column = column
-    this.nodes = []
-    this.isObject = false
-    this.nodesToAnimate = [],
-    this.boardArray = [],
-    this.objectShortestPathNodesToAnimate = [],
-    this.shortestPathNodesToAnimate = [],
-    this.buttonsOn = false;
-    this.start = {
-        id: '',
-        row: 0,
-        column: 0
-    }
-    this.target = {
-        id: '',
-        row: 0,
-        column: 0
-    }
-    this.mouse = {
-        status: '',
-        previouslyNode: '',
-        donw: false,
-    }
+  this.row = row
+  this.column = column
+  this.nodes = []
+  this.isObject = false
+  this.nodesToAnimate = []
+  this.boardArray = []
+  this.objectShortestPathNodesToAnimate = []
+  this.shortestPathNodesToAnimate = []
+  this.buttonsOn = false
+  this.start = {
+      id: '',
+      row: 0,
+      column: 0
+  }
+  this.target = {
+      id: '',
+      row: 0,
+      column: 0
+  }
+  this.mouse = {
+      status: '',
+      previouslyNode: '',
+      donw: false,
+  }
+  this.speed = 'fast'
 }
 
 board.prototype.initialise = function(){
@@ -103,7 +104,6 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
         currentNode = this.nodes[currentNode.previousNode.split('-')[0]][currentNode.previousNode.split('-')[1]];
       }
     }
-    timeout(0);
 
     function timeout(index) {
       if (!currentNodesToAnimate.length) currentNodesToAnimate.push(self.nodes[self.start.row][self.start.column]);
@@ -140,16 +140,20 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
             } else {
               direction = "direction";
             }
-            if (currentNode[direction] === "up") {
-              currentHTMLNode.classList.add("shortest-path-up");
-            } else if (currentNode[direction] === "down") {
-              currentHTMLNode.classList.add("shortest-path-down");
-            } else if (currentNode[direction] === "right") {
-              currentHTMLNode.classList.add("shortest-path-right");
-            } else if (currentNode[direction] === "left") {
-              currentHTMLNode.classList.add("shortest-path-left");
-            } else {
-                currentNode.isShortestPath = true;
+            if(currentNode.status !== "target"){
+              if (currentNode[direction] === "up") {
+                currentHTMLNode.classList.add("shortest-path-up");
+              } else if (currentNode[direction] === "down") {
+                currentHTMLNode.classList.add("shortest-path-down");
+              } else if (currentNode[direction] === "right") {
+                currentHTMLNode.classList.add("shortest-path-right");
+              } else if (currentNode[direction] === "left") {
+                currentHTMLNode.classList.add("shortest-path-left");
+              } else {
+                  currentNode.isShortestPath = true;
+              }
+            }else{
+              self.buttonsOn = false;
             }
           }
         }
@@ -168,6 +172,7 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
         element.classList.add("startTransparent");
       }
     }
+    timeout(0);
 },
 board.prototype.reset = function(objectNotTransparent) {
     this.nodes[this.start.row][this.start.column].status = "start";
