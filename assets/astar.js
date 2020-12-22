@@ -1,5 +1,5 @@
 let _ = require('lodash')
-function astar(nodes, start, target, nodesToAnimate, boardArray, name, heuristic) {
+function astar(nodes, start, target, nodesToAnimate, boardArray, name, heuristic = undefined) {
     if (!start || !target || start.id === target.id) {
         return false;
     }
@@ -15,28 +15,6 @@ function astar(nodes, start, target, nodesToAnimate, boardArray, name, heuristic
         }
     }
     let unvisitedNodes = Object.keys(nodesToObject)
-
-    // for(let row of unvisitedNodes){
-    //     for(let col of row){
-    //         let currentNode = closestNode(nodes, unvisitedNodes);
-    //         for(let row of unvisitedNodes){
-    //             for(let col of row){
-    //                 if(currentNode.status === "wall"){
-    //                     currentNode = closestNode(nodes, unvisitedNodes)
-    //                 }
-    //             }
-    //         }
-    //         if (currentNode.distance === Infinity){
-    //             return false;
-    //         }
-    //         nodesToAnimate.push(currentNode);
-    //         currentNode.isVisited = 'visited';
-    //         if (currentNode.id === target.id) {
-    //             return "success!";
-    //         }
-    //         updateNeighbors(nodes, currentNode, boardArray, target, name, start, heuristic);
-    //     }
-    // }
 
     while (unvisitedNodes.length) {
         let currentNode = closestNode(nodesToObject, unvisitedNodes);
@@ -57,23 +35,6 @@ function astar(nodes, start, target, nodesToAnimate, boardArray, name, heuristic
 }
 function closestNode(nodes, unvisitedNodes) {
     let currentClosest, index;
-    // for(let row of unvisitedNodes){
-    //     for(let col of row){
-    //         if (!currentClosest || currentClosest.totalDistance > nodes[col.row][col.column].totalDistance) {
-    //             currentClosest = nodes[col.row][col.column];
-    //             index_row = col.row;
-    //             index_column = col.column
-    //         } else if (currentClosest.totalDistance === nodes[col.row][col.column].totalDistance) {
-    //             if (currentClosest.heuristicDistance > nodes[col.row][col.column].heuristicDistance) {
-    //                 currentClosest = nodes[col.row][col.column];
-    //                 index_row = col.row;
-    //                 index_column = col.column
-    //             }
-    //         }
-    //     }
-    // }
-    // unvisitedNodes[index_row].splice(index_column, 1);
-
     for (let i = 0; i < unvisitedNodes.length; i++) {
         if (!currentClosest || currentClosest.totalDistance > nodes[unvisitedNodes[i]].totalDistance) {
             currentClosest = nodes[unvisitedNodes[i]];
@@ -118,7 +79,6 @@ function getNeighbors(node, nodes, boardArray) {
     let neighbors = [];
     let potentialNeighbor;
     if (boardArray[x - 1] && boardArray[x - 1][y]) {
-        // potentialNeighbor = `${(x - 1).toString()}-${y.toString()}`
         potentialNeighbor = {
             row: x - 1,
             column: y
@@ -128,7 +88,6 @@ function getNeighbors(node, nodes, boardArray) {
         }
     }
     if (boardArray[x + 1] && boardArray[x + 1][y]) {
-        // potentialNeighbor = `${(x + 1).toString()}-${y.toString()}`
         potentialNeighbor = {
             row: x + 1,
             column: y
@@ -138,7 +97,6 @@ function getNeighbors(node, nodes, boardArray) {
         }
     }
     if (boardArray[x][y - 1]) {
-        // potentialNeighbor = `${x.toString()}-${(y - 1).toString()}`
         potentialNeighbor = {
             row: x,
             column: y - 1
@@ -148,7 +106,6 @@ function getNeighbors(node, nodes, boardArray) {
         }
     }
     if (boardArray[x][y + 1]) {
-        // potentialNeighbor = `${x.toString()}-${(y + 1).toString()}`
         potentialNeighbor = {
             row: x,
             column: y + 1

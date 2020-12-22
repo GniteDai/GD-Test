@@ -9,15 +9,19 @@
       <div class="menu-item" @click="setStart" :class="{ 'menu-item-Selected' : s_function === 'setStart' }">設立 起始點</div>
       <div class="menu-item" @click="setEnd" :class="{ 'menu-item-Selected' : s_function === 'setEnd' }">設立 終點</div>
     </div>
-    <div class="remind-text">
-      set Row => <el-input-number v-model="size.row" @change="reSetSize" :min="5" :max="100" label="Row"></el-input-number>
+    <div style="display: flex;">
+      <div class="remind-text">
+        set Row => <el-input-number v-model="size.row" @change="reSetSize" :min="5" :max="100" label="Row"></el-input-number>
+      </div>
+      <div class="remind-text">
+        set Column => <el-input-number v-model="size.column" @change="reSetSize" :min="5" :max="100" label="Column"></el-input-number>
+      </div>
     </div>
-    <div class="remind-text">
-      set Column => <el-input-number v-model="size.column" @change="reSetSize" :min="5" :max="100" label="Column"></el-input-number>
+    <div style="display: flex;">
+      <div class="remind-text"> 左鍵（預設）設立 終點 </div>
+      <div class="remind-text"> 中鍵 快速執行 Search </div>
+      <div class="remind-text"> 右鍵 快速關閉 選取功能 </div>
     </div>
-    <div class="remind-text"> 左鍵（預設）設立 終點 </div>
-    <div class="remind-text"> 中鍵 快速執行 Search </div>
-    <div class="remind-text"> 右鍵 快速關閉 選取功能 </div>
     <div class="a-star-outer">
       <div class="test-outer" v-for="(row, row_index) in arrayTest" :key="row_index">
         <!-- <div class="test-inner" ref="column" v-for="(column, column_index) in row" :key="column_index" @mouseover="changeRoute(row_index, column)"></div> -->

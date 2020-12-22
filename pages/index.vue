@@ -1,40 +1,33 @@
 <template>
   <div class="index-outer">
-    <div v-if="this.panel !== 'newSearch'">
-      <Header @changePanel="changePanel"/>
-      <div class="panel-outer">
-        <panelContent :panel='panel' v-if="this.panel === ''"/>
-        <AstarSearch :panel='panel' v-if="this.panel === 'A*'"/>
-        <Dmap :panel='panel' v-if="this.panel === 'map'" />
-      </div>
-    </div>
-    
-    <div v-else>
-      <newSearch />
+    <Header @changePanel="changePanel"/>
+    <div class="panel-outer">
+      <PanelContent :panel='panel' v-if="this.panel === ''" />
+      <AstarByMe :panel='panel' v-if="this.panel === 'A*ByMe'"/>
+      <Dmap :panel='panel' v-if="this.panel === 'map'" />
+      <AstarSearchByOther :panel='panel' v-if="this.panel === 'A*'" />
     </div>
   </div>
 </template>
 
 <script>
 import Header from '~/components/header.vue';
-import panelContent from '~/components/panelContent.vue';
-import AstarSearch from '~/components/algorithm/A-star-search.vue';
+import PanelContent from '~/components/panelContent.vue';
+import AstarByMe from '~/components/algorithm/AstarByMe.vue';
 import Dmap from '~/components/mapbox/mapbox.vue';
-
-import newSearch from '~/components/newSearch.vue';
+import AstarSearchByOther from '~/components/algorithm/Astar/index.vue'
 
 export default {
   components: {
     Header,
-    panelContent,
-    AstarSearch,
+    PanelContent,
+    AstarByMe,
     Dmap,
-    newSearch
+    AstarSearchByOther
   },
   data() {
     return {
-      panel: 'newSearch',
-      
+      panel: 'A*',
     }
   },
   methods:{

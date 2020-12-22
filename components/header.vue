@@ -13,12 +13,16 @@ export default {
     return{
       header_info: [
         {
-          title: "A*",
+          title: "A* Second",
           href: 'A*'
         },
         {
           title: "Map",
           href: 'map'
+        },
+        {
+          title: "A* First",
+          href: 'A*ByMe'
         }
       ]
     }
@@ -41,7 +45,7 @@ export default {
     display: flex;
   }
   .logo {
-    width: 20%;
+    width: 10%;
     height: auto;
     cursor: pointer;
   }
