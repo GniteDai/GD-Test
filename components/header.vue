@@ -19,10 +19,6 @@ export default {
         {
           title: "Map",
           href: 'map'
-        },
-        {
-          title: "A* First",
-          href: 'A*ByMe'
         }
       ]
     }

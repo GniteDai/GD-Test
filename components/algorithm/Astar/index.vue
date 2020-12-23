@@ -2,7 +2,7 @@
   <div class="outer">
     <div class="button-panel panel-title">
       <div class="button-padding">A* Algorithm</div>
-      <div class="button-padding button-size-board" @click="reSize=!reSize" :class="{'button-isRun' : reSize}">Set Board</div>
+      <div class="button-padding button-size-board" @click="reSize=!reSize" :class="{'button-isRun' : reSize}">Setting</div>
       <div class="button-padding button-clear-board" @click="clearBoard">Clear Board</div>
       <div class="button-padding button-runAlgorithm-board" @click="runAlgorithm">Run Algorithm</div>
     </div>
