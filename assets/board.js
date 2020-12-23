@@ -24,7 +24,7 @@ function board(row, column) {
     previouslyNode: '',
     donw: false,
   }
-  this.speed = 'average'
+  this.speed = 'fast'
 }
 
 board.prototype.initialise = function(){
