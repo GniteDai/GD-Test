@@ -7,8 +7,12 @@
 # A* search algorithm
 目前功能為
 * 新增、刪除障礙物（Wall），移動起點（Start）、終點（Target）
+  > * 請嘗試使用滑鼠 點擊、點擊後移動（圈選） 來建立或刪除 Wall。
+  > * Start 和 Target 請使用 滑鼠 拖移 的方式來改變其位置。
 * 調整迷宮 row、column、Speed
+  > * Click "Setting" Button 後出現調整介面。
 * Run A* search algorithm
+  > * Click "Run Algorithm" Button 即可。
 
 ```bash
 # install dependencies
