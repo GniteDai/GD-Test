@@ -54,6 +54,7 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
             // 沒找到最短路徑 alert
             console.log("Failure.");
             board.reset();
+            board.buttonsOn = false;
             return;
           }
         }

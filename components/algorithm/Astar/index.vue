@@ -2,11 +2,11 @@
   <div class="outer">
     <div class="button-panel panel-title">
       <div class="button-padding">A* Algorithm</div>
-      <div class="button-padding button-size-board" @click="reSize=!reSize" :class="{'button-isRun' : reSize}">Size Board</div>
+      <div class="button-padding button-size-board" @click="reSize=!reSize" :class="{'button-isRun' : reSize}">Set Board</div>
       <div class="button-padding button-clear-board" @click="clearBoard">Clear Board</div>
       <div class="button-padding button-runAlgorithm-board" @click="runAlgorithm">Run Algorithm</div>
     </div>
-    <reSizeBoard v-if="reSize" @reSize="reSetSize" :boardRow="board.row" :boardColumn="board.column" />
+    <reSizeBoard v-if="reSize" @setSize="setSize" @setSpeed="setSpeed" :board="board" />
     <div class="board">
       <table>
         <tbody>
@@ -50,7 +50,7 @@ export default {
   data(){
     return{
       board: null,
-      reSize: false,
+      reSize: false
     }
   },
   created(){
@@ -62,13 +62,17 @@ export default {
       this.board = new Board(row, column)
       this.board.initialise();
     },
-    reSetSize(row, column){
-      this.initialise(row, column)
+    async setSize(row, column){
+      await this.initialise(row, column)
+      this.clearPath()
+    },
+    setSpeed(speed){
+      this.board.speed = speed;
     },
     eventMouseDown(e, node){
-      this.clearPath()
       e.preventDefault();
       if(!this.board.buttonsOn){
+        this.clearPath()
         if(!this.board.mouse.donw){
           this.board.mouse.donw = true
           switch(node.status){
@@ -179,9 +183,6 @@ export default {
           col.otherpreviousNode = null;
           col.otherdistance = Infinity;
           col.otherdirection = null;
-          if (!relevantStatuses.includes(col.status) && col.weight !== 15) {
-            // col.status = "unvisited";
-          }
           let currentNode = document.getElementById(col.id)
           currentNode.classList.remove('visited')
           currentNode.classList.remove('current')

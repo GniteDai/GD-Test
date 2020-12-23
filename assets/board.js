@@ -10,47 +10,46 @@ function board(row, column) {
   this.shortestPathNodesToAnimate = []
   this.buttonsOn = false
   this.start = {
-      id: '',
-      row: 0,
-      column: 0
+    id: '',
+    row: 0,
+    column: 0
   }
   this.target = {
-      id: '',
-      row: 0,
-      column: 0
+    id: '',
+    row: 0,
+    column: 0
   }
   this.mouse = {
-      status: '',
-      previouslyNode: '',
-      donw: false,
+    status: '',
+    previouslyNode: '',
+    donw: false,
   }
-  this.speed = 'fast'
+  this.speed = 'average'
 }
 
 board.prototype.initialise = function(){
     this.nodes = []
-
     let row_data = []
     let column_data = {}
     for(let i = 0; i< this.row; i++){
-        row_data = []
-        for(let j = 0; j< this.column; j++){
-            column_data = {
-                id: i + '-' + j,
-                row: i,
-                column: j,
-                status: getRandomWall(),
-                weight: 0,
-                isVisited: false,
-                isVisitedWeight: false,
-                isWeightShortestPath: false,
-                isShortestPath: false,
-                isCurrent: false,
-                isStartTransparent: false,
-            }
-            row_data.push(column_data)
+      row_data = []
+      for(let j = 0; j< this.column; j++){
+        column_data = {
+          id: i + '-' + j,
+          row: i,
+          column: j,
+          status: getRandomWall(),
+          weight: 0,
+          isVisited: false,
+          isVisitedWeight: false,
+          isWeightShortestPath: false,
+          isShortestPath: false,
+          isCurrent: false,
+          isStartTransparent: false,
         }
-        this.nodes.push(row_data)
+        row_data.push(column_data)
+      }
+      this.nodes.push(row_data)
     }
 
     this.setStart(0, 0)
@@ -150,7 +149,7 @@ board.prototype.drawShortestPathTimeout = function(targetNodeId, startNodeId, ty
               } else if (currentNode[direction] === "left") {
                 currentHTMLNode.classList.add("shortest-path-left");
               } else {
-                  currentNode.isShortestPath = true;
+                currentNode.isShortestPath = true;
               }
             }else{
               self.buttonsOn = false;
